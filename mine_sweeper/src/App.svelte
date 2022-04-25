@@ -1,14 +1,13 @@
 <script>
 	var sekunder = 0
 	var minuter = 0
-	var mines = 40
+	var mines =2
 	let amount_of_squares = 252
 	let rows = 14
 	let columns = 18
 	let data = [];
 	let container;
 
-	import {onMount} from 'svelte';
 	function timer(){
 		sekunder = sekunder +1
 		if (sekunder == 60) {
@@ -21,11 +20,10 @@
 	for(let i=amount_of_squares; i > 0; i--){
 		let square = {
         id: i,
-        // img: `img/char-${match_id}.png`,
         clicked: false,
 		id: i,
 		mine: false,
-		mines_near_by:0
+		mines_near_by: 0
 		}
 		data.push(square)
 	}
@@ -43,35 +41,37 @@
 	}
 	randomize_array(data)
 
-	function calculate_mines(array){
-		
-		// for(let i=0; i <=3; i++){
-		// 	if (i%columns != 0 && i%columns != 1 && array[i+1].mine == true){
-		// 		array[i].mines_near_by = array[i].mines_near_by +1
-		// 	}
-		// }
-		for(let i=array.length-2; i > 0; i--){
-			if (i%columns != 0 && i%columns != 1 && array[i+1].mine == true){
-				array[i].mines_near_by = array[i].mines_near_by +1
+	function calculate_mines(data_array){
+		for(let index=0; index < data_array.length; index++){
+			const left_edge = (index%columns === 0)
+			const right_edge = (index%columns === columns-1)
+			if(!data_array[index].mine){
+				if(index>0 && !left_edge && data_array[index-1].mine){
+					data_array[index].mines_near_by ++
+				}
+				if(index>columns-1 && !right_edge && data_array[index+ 1- columns].mine){
+					data_array[index].mines_near_by ++
+				}
+				if(index>columns && data_array[index - columns].mine){
+					data_array[index].mines_near_by ++
+				}
+				if(index>columns+1 && !left_edge && data_array[index - columns-1].mine){
+					data_array[index].mines_near_by ++
+				}
+				if(index<amount_of_squares-1 && !right_edge && data_array[index+1].mine){
+					data_array[index].mines_near_by ++
+				}
+				if(index<(amount_of_squares-columns+1) && !left_edge && data_array[index + columns - 1].mine){
+					data_array[index].mines_near_by ++
+				}
+				if(index<(amount_of_squares-columns-1) && !right_edge && data_array[index + columns + 1].mine){
+					data_array[index].mines_near_by ++
+				}
+				if(index<(amount_of_squares-columns) && data_array[index + columns].mine){
+					data_array[index].mines_near_by ++
+				}
 			}
-		}
-		for(let i=1; i < array.length; i++){
-			if (i%columns != 0 && i%columns != 1 && array[i-1].mine == true){
-				console.log("fungerar ändp")
-				array[i].mines_near_by = array[i].mines_near_by +1
-			}
-		}
-		for(let i=0; i < array.length-18; i++){
-			if (array[i+columns].mine == true){
-				console.log("fungerar ändp")
-				array[i].mines_near_by = array[i].mines_near_by +1
-			}
-		}
-		for(let i=18; i < array.length-1; i++){
-			if (array[i-columns].mine == true){
-				console.log("fungerar ändp")
-				array[i].mines_near_by = array[i].mines_near_by +1
-			}
+
 		}
 	}
 	calculate_mines(data)
