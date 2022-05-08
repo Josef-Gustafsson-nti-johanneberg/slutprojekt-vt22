@@ -1,38 +1,46 @@
 <script>
 	var sekunder = 0
-	var minuter = 0
-	var mines = 40
-	let amount_of_squares = 252
-	let columns = 18
+	var mines = 10
+	var mines_left = mines
+	let amount_of_squares = 100
+	let columns = 10
 	let data = [];
+	let firstKlick = true
 	let GameOver = false
 
 	function timer(){
-		sekunder = sekunder +1
-		// if (sekunder == 60) {
-		// minuter = minuter + 1;
-		// sekunder = 0;
-		// }
+		if(!GameOver){
+			sekunder = sekunder +1
+		}
 	}
 	setInterval(() => {timer()}, 1000);
-	function start(){
-		let GameOver = false
 
+	function start(){
+		data = []
 		for(let i=amount_of_squares-1; i >= 0; i--){
 			let square = {
 				id: i,
 				clicked: false,
 				id: i,
 				mine: false,
+				flagged: false,
 				mines_near_by: ""
 			}
 			data.push(square)
 		}
-
-		for(let i=mines; i>0;i--){
-			data[Math.floor(Math.random() * amount_of_squares)].mine = true
-		}
+		create_mines()
 		calculate_mines(data)
+	}
+
+	function create_mines(){
+		for(let i=mines; i>0;i--){
+			var random = Math.floor(Math.random() * amount_of_squares)
+			while(data[random].mine){
+				var random = Math.floor(Math.random() * amount_of_squares)
+			}
+			data[random].mine = true
+			data[random].mines_near_by = "x"
+		}
 	}
 
 	function calculate_mines(data_array){
@@ -41,7 +49,6 @@
 			let right_edge = (index%columns == columns-1)
 			if(!data_array[index].mine){
 				data_array[index].mines_near_by = 0
-
 				if(index>0 && !left_edge && data_array[index-1].mine){
 					data_array[index].mines_near_by ++
 				}
@@ -69,9 +76,7 @@
 				if(data_array[index].mines_near_by == 0){
 					data_array[index].mines_near_by = ""
 				}
-
 			}
-
 		}
 	}
 
@@ -79,65 +84,62 @@
 		let reverse_data = [...data].reverse()
 		let left_edge = (id%columns == 0)
 		let right_edge = (id%columns == columns-1)
-		if(id>0 && !left_edge && reverse_data[(id)-1].clicked != true){
+		if(id>0 && !left_edge && reverse_data[(id)-1].clicked != true && reverse_data[(id)-1].flagged != true){
 			reverse_data[(id)-1].clicked = true
 			display_square_number(reverse_data[(id)-1])
 			if (reverse_data[(id)-1].mines_near_by == 0){
 				explode_squares_near_by(data, id-1)
 			}
 		}
-		if(id>columns-1 && !right_edge && reverse_data[id+ 1- columns].clicked != true){
+		if(id>columns-1 && !right_edge && reverse_data[id+ 1- columns].clicked != true && reverse_data[id+ 1- columns].flagged != true){
 			reverse_data[id+ 1- columns].clicked = true
 			display_square_number(reverse_data[id+ 1- columns])
 			if (reverse_data[id+ 1- columns].mines_near_by == 0){
 				explode_squares_near_by(data, (id+ 1- columns))
 			}
 		}
-		if(id>columns && reverse_data[id - columns].clicked != true){
+		if(id>columns && reverse_data[id - columns].clicked != true && reverse_data[id - columns].flagged != true){
 			reverse_data[id - columns].clicked = true
 			display_square_number(reverse_data[id - columns])
 			if(reverse_data[id - columns].mines_near_by == 0){
 				explode_squares_near_by(data, (id - columns))
 			}	
 		}
-		if(id>columns+1 && !left_edge && reverse_data[id - columns-1].clicked != true){
+		if(id>columns+1 && !left_edge && reverse_data[id - columns-1].clicked != true && reverse_data[id - columns-1].flagged != true){
 			reverse_data[id - columns-1].clicked = true
 			display_square_number(reverse_data[id - columns-1])
 			if(reverse_data[id - columns-1].mines_near_by == 0){
 				explode_squares_near_by(data, (id - columns-1))
 			}
 		}
-		if(id<amount_of_squares-1 && !right_edge && reverse_data[id+1].clicked != true){
+		if(id<amount_of_squares-1 && !right_edge && reverse_data[id+1].clicked != true && reverse_data[id+1].flagged != true){
 			reverse_data[id+1].clicked = true
 			display_square_number(reverse_data[id+1])
 			if(reverse_data[id+1].mines_near_by == 0){
 				explode_squares_near_by(data, (id+1))
 			}
 		}
-		if(id<(amount_of_squares-columns+1) && !left_edge && reverse_data[id + columns - 1].clicked != true){
+		if(id<(amount_of_squares-columns+1) && !left_edge && reverse_data[id + columns - 1].clicked != true && reverse_data[id + columns - 1].flagged != true){
 			reverse_data[id + columns - 1].clicked = true
 			display_square_number(reverse_data[id + columns - 1])
 			if(reverse_data[id + columns - 1].mines_near_by == 0){
 				explode_squares_near_by(data, (id + columns - 1))
 			}
 		}
-		if(id<(amount_of_squares-columns-1) && !right_edge && reverse_data[id + columns + 1].clicked != true){
+		if(id<(amount_of_squares-columns-1) && !right_edge && reverse_data[id + columns + 1].clicked != true && reverse_data[id + columns + 1].flagged != true){
 			reverse_data[id + columns + 1].clicked = true
 			display_square_number(reverse_data[id + columns + 1])
 			if(reverse_data[id + columns + 1].mines_near_by == 0){
 				explode_squares_near_by(data, (id + columns + 1))
 			}
 		}
-		if(id<(amount_of_squares-columns) && reverse_data[id + columns].clicked != true){
+		if(id<(amount_of_squares-columns) && reverse_data[id + columns].clicked != true && reverse_data[id + columns].flagged != true){
 			reverse_data[id + columns].clicked = true
 			display_square_number(reverse_data[id + columns])
 			if(reverse_data[id + columns].mines_near_by == 0){
 				explode_squares_near_by(data, (id + columns))
 			}
 		}
-	}
-	function test(){
-		start()
 	}
 
 	function game_over(){
@@ -152,6 +154,7 @@
 		}
 		GameOver = true
 	}
+
 	function display_square_number(data){
 		document.getElementById(data.id).classList.toggle("unclicked")
 		if(data.mine){
@@ -162,32 +165,68 @@
 	}
 	
 	function clicked_square(dataa){
-		if (GameOver == false){
-			if (dataa.mine){
-				dataa.clicked = true
+		if(firstKlick){
+			while ([...data].reverse()[dataa.id].mines_near_by !== ""){
+				for(let i=amount_of_squares-1; i >= 0; i--){
+					data[i].mine = false
+				}
+				create_mines()
+				calculate_mines(data)
+			}
+			firstKlick = false
+		}
+		if(!GameOver){
+			if(dataa.mine && !dataa.flagged){
 				game_over()
-				
-			}else{
+			}else if(!dataa.clicked && !dataa.flagged){
 				dataa.clicked = true
-				display_square_number(dataa)
+				display_square_number([...data].reverse()[dataa.id])
 				if (dataa.mines_near_by == 0){
 					explode_squares_near_by(data, dataa.id)
-
 				}
-
 			}
 		}			
+	}
+
+	function right_click(dataa){
+		if(!GameOver){
+			if(!dataa.clicked){
+				if (dataa.flagged){
+					document.getElementById(dataa.id).innerHTML = " "
+					dataa.flagged = false
+					mines_left ++
+				}else if(mines_left >0){
+					dataa.flagged = true
+					document.getElementById(dataa.id).innerHTML = "🚩"
+					mines_left --
+				}
+			}
+		}
+		// måste vara bättre vinnst logik
+		if(mines_left == 0){
+			let amount_flagged_correctly = 0
+			for(let i=amount_of_squares-1; i >= 0; i--){
+				if(data[i].mine && data[i].flagged){
+					amount_flagged_correctly ++
+				}
+			}
+			if (amount_flagged_correctly == mines){
+				console.log("du vann")
+				GameOver = true
+
+			}
+		}
 	}
 	start()
 </script>
 
 <main>
 	<header>
-		<h1>JS Vanilla Mine Sweeper</h1>
+		<h1>Svelte Vanilla Mine Sweeper</h1>
 	</header>
 	<section id = "info">
 		<article>
-			<p>{mines}</p>
+			<p>{mines_left}</p>
 		</article>
 		<article id="smily" >
 			<img src="../img/happyComputer.png" alt="">
@@ -198,20 +237,8 @@
 	</section>
 	<section id = 'spel_plan'>
 		{#each [...data].reverse() as data}
-			{#if data.id %2 == 0}
-			<article id="{data.id}" class="unclicked odd" on:click|once={()=>clicked_square(data)}>
-				{#if !data.mine}
-					<!-- <p>{data.mines_near_by}</p> -->
-				{/if}
+			<article id="{data.id}" class="unclicked" on:click={()=>clicked_square(data)} on:contextmenu|preventDefault={()=>right_click(data)}>
 			</article>
-			{:else if data.id %2 == 1}
-			<article id="{data.id}" class="unclicked even" on:click|once={()=>clicked_square(data)}>
-				{#if !data.mine}
-					<!-- <p>{data.mines_near_by}</p> -->
-				{/if}
-			</article>
-			{/if}
-	
 		{/each}
 	</section>
 
@@ -236,6 +263,8 @@
 			width: 100%;
 		}
 		#info{
+			padding-top: .5rem;
+			padding-bottom: .5rem;
 			height: 3rem;
 			width: 30.6rem;
 			display: flex;
@@ -252,7 +281,7 @@
 		}
 		#spel_plan{
 			display: grid;
-			grid-template-columns: repeat(18, 2rem);
+			grid-template-columns: repeat(10, 2rem);
 			// width: 27rem;
 			// gap: 0.2rem;
 			// .even{
@@ -269,6 +298,7 @@
 			article{
 
 				// border: 1px solid black;
+				text-align: center;
 				background-color: #bbbbbb;
 				border: 2px solid #707070;
 
