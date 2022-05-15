@@ -1,14 +1,14 @@
 <script>
-	var sekunder = 0
-	var mines = 20
-	var mines_left = mines
+	let sekunder = 0
+	let mines = 30
+	let mines_left = mines
 	let columns = 15
 	let amount_of_squares = columns *10
 	let data = [];
 	let firstKlick = true
 	let GameOver = false
-	var boom_sound = new Audio('../audio/boom.mp3');
-	var victory_sound = new Audio('../audio/victory.mp3');
+	let boom_sound = new Audio('../audio/boom.mp3');
+	let victory_sound = new Audio('../audio/victory.mp3');
 
 	function timer(){
 		if(!GameOver){
@@ -18,7 +18,6 @@
 	setInterval(() => {timer()}, 1000);
 
 	function start(){
-		data = []
 		for(let i=amount_of_squares-1; i >= 0; i--){
 			let square = {
 				id: i,
@@ -34,9 +33,9 @@
 
 	function create_mines(){
 		for(let i=mines; i>0;i--){
-			var random = Math.floor(Math.random() * amount_of_squares)
+			let random = Math.floor(Math.random() * amount_of_squares)
 			while(data[random].mine){
-				var random = Math.floor(Math.random() * amount_of_squares)
+				random = Math.floor(Math.random() * amount_of_squares)
 			}
 			data[random].mine = true
 			data[random].mines_near_by = "x"
@@ -63,7 +62,6 @@
 				if(index>columns && !left_edge && data_array[index - columns-1].mine){
 					data_array[index].mines_near_by ++
 				}
-				console.log(data_array[index])
 				if(index<amount_of_squares-1 && !right_edge && data_array[index+1].mine){
 					data_array[index].mines_near_by ++
 				}
@@ -276,13 +274,19 @@
 	@import './variables';
 	@import url('https://fonts.googleapis.com/css2?family=MuseoModerno:wght@900&display=swap');
 
-	// mixin
-	// @mixin center{
-	// 	display: flex;
-	// 	justify-content: center;
-	// 	align-items: center;
-	// }
-	// @include center
+	@mixin border_2px{
+		box-sizing: border-box;
+		border: 2px solid;
+	}
+	@mixin border_10px{
+		border: 10px solid;
+		border-color:  $darkGray $lightGray $lightGray $darkGray;
+	}
+
+	@mixin center{
+		display: flex;
+		align-items: center;
+	}
 
 	*{
 		margin: 0px;
@@ -290,75 +294,64 @@
 		font-family: 'MuseoModerno', cursive;
 	}
 	main{
+		@include center;
 		width: 100vw;
 		height: 100vh;
-		display: flex;
 		flex-direction: column;
-		align-items: center;
-		background-image: linear-gradient(to bottom right, rgb(230, 230, 230), rgb(141, 141, 141));
+		background-image: linear-gradient(to bottom right, $lightGray, $darkGray);
 	
 		header{
 			text-align: center;
-			background-image: linear-gradient(rgb(134, 134, 134), rgb(235, 235, 235));
+			background-image: linear-gradient( $lightGray, $darkGray);
 			width: 100%;
 			font-size: 2rem;
 		}
 		#info{
-			border: 10px solid;
-			border-color: #999999 #eeeeee #eeeeee #999999;
-			padding-top: .5rem;
-			// margin-bottom: 1rem;
-			height: 3rem;
-			width: $widht;
-			display: flex;
+			@include center;
 			justify-content: space-between;
-			align-items: center;
+			@include border_10px();
+			height: 4rem;
+			width: $widht;
+			box-shadow: $pinkShadow;
+			background-color: $gray;
 			article{
 				width: 33%;
 				text-align: center;
 				p{
-					font-size: 2.9rem;
+					font-size: 3rem;
 					font-weight: 700;
 					color: red;
 				}
 			}
 			:global(img){
-				height: 2.9rem;
+				height: 3rem;
 			}
-			box-shadow: rgb(133, 38, 98) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;			// width: 27rem;
-
-
 		}
 		#spel_plan{
 			display: grid;
 			grid-template-columns: repeat($column, 2.5rem);
-			border: 10px solid ;
-			border-color: #999999 #eeeeee #eeeeee #999999;
-			box-shadow: rgb(133, 38, 98) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;			// width: 27rem;
+			@include border_10px();
+			box-shadow: $pinkShadow;
 		
 			article{
 				cursor: pointer;
+				@include border_2px();
 				text-align: center;
 				background-color: #bbbbbb;
-				border: 2px solid #707070;
+				border-color: $darkGray;
 				width: 2.5rem;
 				height: 2.5rem;
-				box-sizing: border-box;
 				font-size: 1.6rem;
 				font-weight: 100;
 				:global(img){
 					width: 2.2rem;
 					height: 2.2rem;
 				}
-				
 			}
-		
 			.unclicked{
-				box-sizing: border-box;
-				border: 2px solid;
-				border-color: #eeeeee #999999 #999999 #eeeeee;
-				background-color: #cccccc;
-				
+				@include border_2px();
+				border-color: $lightGray $darkGray $darkGray $lightGray;
+				background-color: $gray;
 			}
 		}
 	}
